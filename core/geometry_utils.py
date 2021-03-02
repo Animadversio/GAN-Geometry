@@ -1,5 +1,6 @@
 """
-Collection of some Geometric Utility function reusable across script
+Collection of geometric utility functions reusable across script.
+Useful for exploration in GANs. 
 """
 import numpy as np
 from numpy.linalg import norm
@@ -38,6 +39,7 @@ def SExpMap(refcode, tan_vec, steps, lim=(0,1)):
     angles = np.linspace(lim[0], lim[1], steps, endpoint=True)[:, np.newaxis]
     exp_code = (np.cos(angles) @ refcode / refnorm + np.sin(angles) @ realtanv / tannorm) * refnorm
     return exp_code
+    
 #%% Geometric Utility Function
 def ExpMap(x, tang_vec, EPS = 1E-4):
     angle_dist = sqrt((tang_vec ** 2).sum(axis=1))  # vectorized
