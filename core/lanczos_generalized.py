@@ -172,7 +172,7 @@ def lanczos(
         x = torch.from_numpy(x)
         if use_gpu:
             x = x.cuda()
-        out = operator.apply(x)
+        out = operator.apply(x.float())
         out = out.cpu().numpy()
         return out
 

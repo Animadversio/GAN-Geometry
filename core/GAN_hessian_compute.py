@@ -5,11 +5,12 @@ Binxu Wang
 Sep,2020
 """
 import numpy as np
+from time import time
 # from hessian_eigenthings.lanczos import lanczos
 from .lanczos_generalized import lanczos
 from .GAN_hvp_operator import GANForwardMetricHVPOperator, GANHVPOperator, get_full_hessian
 
-def hessian_compute(G, feat, ImDist, hessian_method="BackwardIter", cutoff=None, preprocess=lambda img: img, EPS=1E-2, device="cuda"):
+def hessian_compute(G, feat, ImDist, hessian_method="BackwardIter", cutoff=None, preprocess=lambda img: img, EPS=1E-3, device="cuda", ):
     """Higher level API for GAN hessian compute
     For iterative methods "BackwardIter" "ForwardIter", it 
         1. Defines the HVP operator as in GAN_hvp_operator
@@ -36,6 +37,7 @@ def hessian_compute(G, feat, ImDist, hessian_method="BackwardIter", cutoff=None,
         eigvects: 
         H: Hessian matrix. numpy array of [n, n], 
     """
+    T0 = time()
     if cutoff is None: cutoff = feat.numel() // 2 - 1
     if 'to' in dir(ImDist): ImDist.to(device)
     if hessian_method == "BackwardIter":
@@ -58,6 +60,7 @@ def hessian_compute(G, feat, ImDist, hessian_method="BackwardIter", cutoff=None,
         eigvals, eigvects = np.linalg.eigh(H)
     else:
         raise NotImplementedError
+    print("Hessian computed with %s in %.2f sec" % (hessian_method, time() - T0))
     return eigvals, eigvects, H
 
 def layer_hessian_compute(feat, net, ):

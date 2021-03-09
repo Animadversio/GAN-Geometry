@@ -297,7 +297,7 @@ class GANForwardMetricHVPOperator(Operator):
             return torch.zeros_like(vec).cuda()
         EPS = self.EPS if EPS is None else EPS
         self.perturb_norm = self.code.norm() * EPS
-        eps = self.perturb_norm / vecnorm
+        eps = (self.perturb_norm / vecnorm).float()
         # take the second gradient by comparing 2 first order gradient.
         perturb_vecs = self.code.detach() + eps * torch.tensor([1, -1.0]).view(-1, 1).to(self.device) * vec.to(self.device).detach()
         perturb_vecs.requires_grad_(True)

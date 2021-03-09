@@ -12,13 +12,18 @@ Wrapper and loader of various GANs are listed, currently we have
 * DCGAN
 """
 #%%
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
-from collections import OrderedDict
 import os
 from os.path import join
 from sys import platform
+from collections import OrderedDict
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+import numpy as np
+from PIL import Image
+from IPython.display import clear_output
+from .build_montages import build_montages, color_framed_montages
+from .torch_utils import progress_bar
 load_urls = False
 if platform == "linux":  # CHPC cluster
     # homedir = os.path.expanduser('~')
@@ -210,11 +215,7 @@ class upconvGAN(nn.Module):
                 csr = csr_end
         return img_all
 
-import numpy as np
-from PIL import Image
-from build_montages import build_montages, color_framed_montages
-from IPython.display import clear_output
-from hessian_eigenthings.utils import progress_bar
+
 def visualize_np(G, code, layout=None, show=True):
     """Utility function to visualize a np code vectors.
 
@@ -630,6 +631,10 @@ def loadDCGAN(onlyG=True):
 class DCGAN_wrapper():  # nn.Module
     def __init__(self, DCGAN, ):
         self.DCGAN = DCGAN
+
+    def sample_vector(self, sampn=1, device="cuda"):
+        refvec = torch.randn((sampn, 120)).to(device)
+        return refvec
 
     def visualize(self, code, scale=1.0):
         imgs = self.DCGAN(code,)  # Matlab version default to 0.7

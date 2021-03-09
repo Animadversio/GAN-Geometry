@@ -7,7 +7,10 @@ This lib curates functions that are useful for Hessian analysis for different GA
 """
 import sys
 import re
+import os
+from os.path import join
 from glob import glob
+from time import time
 from tqdm import tqdm
 import numpy as np
 import matplotlib.pylab as plt
@@ -15,9 +18,7 @@ from matplotlib import cm
 import matplotlib
 matplotlib.rcParams['pdf.fonttype'] = 42
 matplotlib.rcParams['ps.fonttype'] = 42
-from time import time
-import os
-from os.path import join
+
 def scan_hess_npz(Hdir, npzpat="Hess_BP_(\d*).npz", evakey='eva_BP', evckey='evc_BP', featkey=None):
     """ Function to load in npz and collect the spectra.
     Set evckey=None to avoid loading eigenvectors.
