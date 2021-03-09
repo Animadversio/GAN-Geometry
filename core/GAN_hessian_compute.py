@@ -6,8 +6,8 @@ Sep,2020
 """
 import numpy as np
 # from hessian_eigenthings.lanczos import lanczos
-from lanczos_generalized import lanczos
-from GAN_hvp_operator import GANForwardMetricHVPOperator, GANHVPOperator, get_full_hessian
+from .lanczos_generalized import lanczos
+from .GAN_hvp_operator import GANForwardMetricHVPOperator, GANHVPOperator, get_full_hessian
 
 def hessian_compute(G, feat, ImDist, hessian_method="BackwardIter", cutoff=None, preprocess=lambda img: img, EPS=1E-2, device="cuda"):
     """Higher level API for GAN hessian compute

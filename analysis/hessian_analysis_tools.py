@@ -118,8 +118,10 @@ def corr_nan_torch(V1, V2):
     return corr_torch(V1[~Msk], V2[~Msk])
 
 def compute_hess_corr(eigval_col, eigvec_col, savelabel="", figdir="", use_cuda=False):
-    """cuda should be used for large mat mul like 512 1024 4096.
-    small matmul should stay with cpu numpy computation. cuda will add the IO overhead."""
+    """
+    User Note: cuda should be used for large mat mul like 512 1024 4096.
+    small matmul should stay with cpu numpy computation. cuda will add the IO overhead.
+    """
     posN = len(eigval_col)
     T0 = time()
     if use_cuda:
@@ -263,7 +265,7 @@ def plot_consistency_hist(corr_mat_log, corr_mat_lin, savelabel="", figdir="", t
     fig2.savefig(join(figdir, "Hess_%s_corr_mat_lin_hist.pdf"%savelabel))
     # fig2.show()
     return fig1, fig2
-#%% Derive from BigBiGAN
+#%%
 def plot_consistency_example(eigval_col, eigvec_col, nsamp=5, titstr="GAN", figdir="", savelabel=""):
     """
     Note for scatter plot the aspect ratio is set fixed to one.
@@ -586,7 +588,7 @@ def hessian_summary_pipeline(savedir, modelnm, figdir, npzpatt="Hess_BP_(\d*).np
     fig3 = plot_consistency_example(eva_col, evc_col, figdir=figdir, nsamp=5, titstr="%s" % modelnm, savelabel=modelnm)
     fig3 = plot_consistency_example(eva_col, evc_col, figdir=figdir, nsamp=3, titstr="%s" % modelnm, savelabel=modelnm)
 
-#%% Hessian comparison at the same location
+#%% Section: Hessian comparison at the same location
 def spectra_cmp(eigvals1, eigvals2, show=True):
     cc = np.corrcoef((eigvals1), (eigvals2))[0, 1]
     logcc = np.corrcoef(np.log10(np.abs(eigvals1)+1E-8), np.log10(np.abs(eigvals2)+1E-8))[0, 1]

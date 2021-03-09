@@ -1,10 +1,9 @@
 """ Use scipy/ARPACK implicitly restarted lanczos to find top k eigenthings
 This code solve generalized eigenvalue problem for operators or matrices
 Format adapted from lanczos.py in hessian-eigenthings
-https://github.com/noahgolmant/pytorch-hessian-eigenthings/blob/8ff8b3907f2383fe1fdaa232736c8fef295d8131/hessian_eigenthings/lanczos.py#L11
 """
-import numpy as np
 import torch
+import numpy as np
 from scipy.sparse.linalg import LinearOperator as ScipyLinearOperator
 from scipy.sparse.linalg import eigsh
 from warnings import warn
@@ -23,12 +22,16 @@ def lanczos_generalized(
 ):
     """
     Use the scipy.sparse.linalg.eigsh hook to the ARPACK lanczos algorithm
-    to find the top k eigenvalues/eigenvectors.
+    to find the top k eigenvalues/eigenvectors for the *generalized eigen problem*. 
+        A v = lambda B v
+    B is the metric tensor of the linear space, while A is the linear function on it. 
 
     Parameters
     -------------
     operator: power_iter.Operator
-        linear operator to solve.
+        linear operator A to solve.
+    metric_operator: Operator, linear operator B. 
+    metric_inv_operator: Operator, linear operator B^{-1}. 
     num_eigenthings : int
         number of eigenvalue/eigenvector pairs to compute
     which : str ['LM', SM', 'LA', SA']
@@ -123,6 +126,7 @@ def lanczos(
     use_gpu=False,
 ):
     """
+    https://github.com/noahgolmant/pytorch-hessian-eigenthings/blob/8ff8b3907f2383fe1fdaa232736c8fef295d8131/hessian_eigenthings/lanczos.py#L11
     Use the scipy.sparse.linalg.eigsh hook to the ARPACK lanczos algorithm
     to find the top k eigenvalues/eigenvectors.
     Parameters

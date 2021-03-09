@@ -1,6 +1,9 @@
+import sys
+import time
+import torch
 from torchvision.utils import make_grid
 from torchvision.transforms import ToPILImage
-import torch
+
 def show_imgrid(img_tsr, *args, **kwargs):
     if type(img_tsr) is list:
         if img_tsr[0].ndim == 4:
@@ -18,9 +21,12 @@ def save_imgrid(img_tsr, path, *args, **kwargs):
 
 # Utils below are fetched from `hessian_eigenthings` 
 #       https://github.com/noahgolmant/pytorch-hessian-eigenthings/blob/8ff8b3907f2383fe1fdaa232736c8fef295d8131/hessian_eigenthings/utils.py#L19
+import shutil
 def maybe_fp16(vec, fp16):
     return vec.half() if fp16 else vec.float()
 
+TOTAL_BAR_LENGTH = 65.0
+term_width = shutil.get_terminal_size().columns
 last_time = time.time()
 begin_time = last_time
 

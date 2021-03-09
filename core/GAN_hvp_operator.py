@@ -1,19 +1,19 @@
 """
 This lib defines the Hessian vector product (HVP) operators to be used in Lanczos Iteration based Hessian computations.
-At conceptual level, they all compute HVP of Hessian matrices involves : 
-    a GAN G:z->x and 
-    a function D, which can be an unary activation or objective function `D: x->d` Or it can be a binary metric function `D: x_1, x_2 -> d` 
-    a reference vector, code z_0 to compute Hessian at. 
+At conceptual level, they all compute HVP of Hessian matrices involves :
+    a GAN G:z->x and
+    a function D, which can be an unary activation or objective function `D: x->d` Or it can be a binary metric function `D: x_1, x_2 -> d`
+    a reference vector, code z_0 to compute Hessian at.
 
-The Hessian is mathematically defined as 
+The Hessian is mathematically defined as
     $H = \partial^2_dz D(G(z_0),G(z_0+dz))$, for binary, metric `D`
-or  
+or
     $H = \partial^2_dz D(G(z_0+dz))$, for unary, activation `D`
 
 Specifically:
-    `GANHVPOperator` computes HVP for unary and binary D, using backward autodifferencing. 
-    `GANForwardHVPOperator` computes HVP for unary D, using forward autodifferencing. 
-    `GANForwardMetricHVPOperator` computes HVP for binary metric D, using forward autodifferencing. 
+    `GANHVPOperator` computes HVP for unary and binary D, using backward autodifferencing.
+    `GANForwardHVPOperator` computes HVP for unary D, using forward autodifferencing.
+    `GANForwardMetricHVPOperator` computes HVP for binary metric D, using forward autodifferencing.
 
 These operator classes can compute HVP or vHv, which essentially works as the local distance metric on the GAN image manifold.
 
@@ -21,13 +21,15 @@ Code structure inspired by `hessian_eigenthings`
 Binxu Wang
 Created July. 13th, 2020. Note added Mar.1st, 2021
 """
+import sys
+from time import time
 import torch
 import torch.nn.functional as F
 from hessian_eigenthings.power_iter import deflated_power_iteration
-from lanczos_generalized import lanczos, lanczos_generalized
 from sklearn.cross_decomposition import CCA
-from time import time
-import sys
+from IPython.display import clear_output
+from .lanczos_generalized import lanczos, lanczos_generalized
+from .torch_utils import progress_bar
 
 class Operator:
     """
@@ -379,8 +381,7 @@ def compute_hessian_eigenthings(
         raise ValueError("Unsupported mode %s (must be power_iter or lanczos)" % mode)
     return eigenvals, eigenvecs
 
-from IPython.display import clear_output
-from torch_utils import progress_bar
+
 def get_full_hessian(loss, param):
     # modified from hessian_eigenthings repo. api follows hessian.hessian
     # See https://discuss.pytorch.org/t/compute-the-hessian-matrix-of-a-network/15270/3
