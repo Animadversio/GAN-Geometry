@@ -3,7 +3,8 @@
 This lib curates functions that are useful for Hessian analysis for different GANs
 - load computed hess npz
 - Visualize spectra
-
+- Visualize consistency of Hessian matrices across position in the latent space
+- General pipeline of analysis
 """
 import sys
 import re

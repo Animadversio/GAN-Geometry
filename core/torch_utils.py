@@ -4,6 +4,7 @@ import torch
 from torchvision.utils import make_grid
 from torchvision.transforms import ToPILImage
 
+# utils to show 4d torch tensors as grid of images.
 def show_imgrid(img_tsr, *args, **kwargs):
     if type(img_tsr) is list:
         if img_tsr[0].ndim == 4:
