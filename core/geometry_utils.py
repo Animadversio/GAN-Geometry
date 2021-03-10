@@ -5,7 +5,7 @@ Useful for exploration in GANs.
 import numpy as np
 from numpy.linalg import norm
 from numpy import sqrt
-#%% Utility functions for interpolation
+#%% Utility functions for interpolation / exploration
 def SLERP(code1, code2, steps, lim=(0,1)):
     """Spherical Linear Interpolation for numpy arrays"""
     code1, code2 = code1.squeeze(), code2.squeeze()
@@ -24,14 +24,14 @@ def LERP(code1, code2, steps, lim=(0,1)):
     return slerp_code
 
 def LExpMap(refcode, tan_vec, steps, lim=(0,1)):
-    """ Linear Interpolation for numpy arrays"""
+    """ Linear Exponential map for numpy arrays"""
     refcode, tan_vec = refcode.reshape(1,-1), tan_vec.reshape(1,-1)
     ticks = np.linspace(lim[0], lim[1], steps, endpoint=True)[:, np.newaxis]
     exp_code = refcode + ticks @ tan_vec
     return exp_code
 
 def SExpMap(refcode, tan_vec, steps, lim=(0,1)):
-    """ Linear Interpolation for numpy arrays"""
+    """ Spherical Exponential map for numpy arrays"""
     refcode, tan_vec = refcode.reshape(1,-1), tan_vec.reshape(1,-1)
     refnorm = np.linalg.norm(refcode)
     realtanv = tan_vec - (tan_vec@refcode.T)@refcode/refnorm**2
