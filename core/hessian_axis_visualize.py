@@ -26,12 +26,9 @@ from time import time
 from os.path import join
 from imageio import imwrite, imsave
 from PIL import Image
+from .torch_utils import show_npimage, show_imgrid
 from .build_montages import build_montages, color_framed_montages
 from .geometry_utils import SLERP, LERP, LExpMap, SExpMap
-# from .GAN_utils import upconvGAN, loadBigGAN, loadBigBiGAN, loadStyleGAN2, BigGAN_wrapper, BigBiGAN_wrapper, \
-#     StyleGAN2_wrapper
-from .GAN_hessian_compute import hessian_compute, get_full_hessian
-from .hessian_analysis_tools import scan_hess_npz, compute_hess_corr, plot_spectra, average_H
 
 def vis_eigen_frame(eigvect_avg, eigv_avg, G, ref_code=None, eiglist=None, eig_rng=(0, 4096), page_B=50, transpose=True,
                     maxdist=120, rown=7, sphere=False, 
@@ -151,6 +148,9 @@ def vis_eigen_explore(ref_code, eigvect_avg, eigv_avg, G, ImDist=None, eiglist=[
     if save:
         imsave(join(figdir, "%s_%d-%d_%04d.jpg" % (namestr, eiglist[0]+1, eiglist[-1]+1, RND)), np.uint8(mtg * 255.0))
         plt.imsave(join(figdir, "%s_%d-%d_%04d.pdf" % (namestr, eiglist[0]+1, eiglist[-1]+1, RND)), mtg, )
+    else:
+        show_npimage(mtg)
+
     print("Finish printing page (%.1fs)" % (time() - t0))
     if ImDist is not None: # if distance metric available then compute this
         distmat, ticks, fig = vis_distance_curve(ref_code, eigvect_avg, eigv_avg, G, ImDist, eiglist=eiglist,
@@ -183,6 +183,8 @@ def vis_eigen_explore_row(ref_code, eigvect_avg, eigv_avg, G, eiglist=[1,2,4,7,1
         if save:
             imsave(join(figdir, "%s_eig%d_%04d.jpg" % (namestr, eigi+1, RND)), np.uint8(mtg * 255.0))
             plt.imsave(join(figdir, "%s_eig%d_%04d.pdf" % (namestr, eigi+1, RND)), mtg, )
+        else:
+            show_npimage(mtg)
         mtg_col.append(mtg)
         if indivimg and save: # save individual images. 
             for deviation, img in zip(ticks, img_page):
@@ -237,7 +239,7 @@ def vis_distance_curve(ref_code, eigvect_avg, eigvals_avg, G, ImDist, eiglist=[1
     codes_all = np.concatenate(tuple(codes_page), axis=0)
     img_page = G.visualize_batch_np(codes_all)
     with torch.no_grad():
-        dist_all = ImDist(refimg, img_page).squeeze()
+        dist_all = ImDist(refimg.cuda(), img_page.cuda()).squeeze().cpu()
     distmat = dist_all.reshape(-1, distrown).numpy()
     fig = plt.figure(figsize=[5, 3])
     for idx, eigi in enumerate(eiglist):
@@ -253,7 +255,7 @@ def vis_distance_curve(ref_code, eigvect_avg, eigvals_avg, G, ImDist, eiglist=[1
     return distmat, ticks, fig
 
 def vis_eigen_action(eigvec, ref_codes, G, maxdist=120, rown=7, sphere=False, 
-                    page_B=50, transpose=True, figdir="", namestr="", RND=None):
+                    page_B=50, transpose=True, save=True, figdir="", namestr="", RND=None):
     """ Visualize action of an eigenvector on multiple reference images.
     
     Input:
@@ -274,6 +276,7 @@ def vis_eigen_action(eigvec, ref_codes, G, maxdist=120, rown=7, sphere=False,
             if transpose is True, this is the number of images each row. 
         
     Save parameters:
+        save: Bool. save figure or just show.
         figdir: Directory to output figures. 
         namestr: Prefix for the saved figure.
         RND: Random number identifier for saved figure. (same for each sequence. default to be 4 digits RND)
@@ -300,8 +303,11 @@ def vis_eigen_action(eigvec, ref_codes, G, maxdist=120, rown=7, sphere=False,
             codes_all = np.concatenate(tuple(codes_page), axis=0)
             img_page = G.render(codes_all)
             mtg = build_montages(img_page, (256, 256), (rown, idx - csr + 1), transpose=transpose)[0]
-            imsave(join(figdir, "%s_ref_%d-%d_%04d.jpg" %
+            if save:
+                imsave(join(figdir, "%s_ref_%d-%d_%04d.jpg" %
                         (namestr, csr, idx, RND)), np.uint8(mtg * 255.0))
+            else:
+                show_npimage(mtg)
             codes_col.append(codes_all)
             codes_page = []
             print("Finish printing page vector %d-%d (%.1fs)"%(csr, idx, time()-t0))
@@ -309,7 +315,7 @@ def vis_eigen_action(eigvec, ref_codes, G, maxdist=120, rown=7, sphere=False,
     return mtg, codes_col
 
 def vis_eigen_action_row(eigvec, ref_codes, G, maxdist=120, rown=7, sphere=False, 
-                    transpose=True, figdir="", namestr="", RND=None, indivimg=False,):
+                    transpose=True, save=True, figdir="", namestr="", RND=None, indivimg=False,):
     """Same as `vis_eigen_action` just print each row separately
     Additional Parameter:
         indivimg: Save individual image separately. 
@@ -329,8 +335,11 @@ def vis_eigen_action_row(eigvec, ref_codes, G, maxdist=120, rown=7, sphere=False
             interp_codes = SExpMap(ref_code, eigvec, rown, (-maxdist, maxdist))
         img_page = G.render(interp_codes)
         mtg = build_montages(img_page, (256, 256), (rown, 1), transpose=transpose)[0]
-        imsave(join(figdir, "%s_ref_%d_%04d.jpg" %
+        if save:
+            imsave(join(figdir, "%s_ref_%d_%04d.jpg" %
                     (namestr, idx, RND)), np.uint8(mtg * 255.0))
+        else:
+            show_npimage(mtg)
         codes_col.append(interp_codes)
         mtg_col.append(mtg)
         if indivimg:
@@ -340,6 +349,7 @@ def vis_eigen_action_row(eigvec, ref_codes, G, maxdist=120, rown=7, sphere=False
     return mtg_col, codes_col
 
 if __name__ == "__main__":
+    from .GAN_utils import BigGAN_wrapper, loadBigGAN, upconvGAN
     from lpips import LPIPS
     ImDist = LPIPS(net="squeeze")
     #%% FC6 GAN on ImageNet
@@ -374,23 +384,21 @@ if __name__ == "__main__":
     ref_code = codes_all.mean(axis=0, keepdims=True)
     #%%
     figdir = r"E:\OneDrive - Washington University in St. Louis\HessTune\HessEigVec_Text"
-    vis_eigen_frame(eigvect_avg, eigv_avg, figdir=figdir, ref_code=ref_code,
+    vis_eigen_frame(eigvect_avg, eigv_avg, G, figdir=figdir, ref_code=ref_code,
                     maxdist=120, rown=7, eig_rng=(0, 4096))
     #%%
-
     figdir = r"E:\OneDrive - Washington University in St. Louis\Hessian_summary\fc6GAN"
     vis_eigen_frame(eigvect_avg, eigv_avg, ref_code=None, figdir=figdir, page_B=50,
                     eiglist=[0,1,2,5,10,20,30,50,100,200,300,400,600,800,1000,2000,3000,4000], maxdist=240, rown=5,
                     transpose=False)
     #%%
-    vis_eigen_action(eigvect_avg[:, -5], np.random.randn(10,4096), figdir=figdir, page_B=50,
+    vis_eigen_action(eigvect_avg[:, -5], np.random.randn(10,4096), G, figdir=figdir, page_B=50,
                         maxdist=20, rown=5, transpose=False)
     #%%
-    vis_eigen_action(eigvect_avg[:, -5], None, figdir=figdir, page_B=50,
+    vis_eigen_action(eigvect_avg[:, -5], None, G, figdir=figdir, page_B=50,
                         maxdist=20, rown=5, transpose=False)
-
     #%% BigGAN on ImageNet Class Specific
-    from .GAN_utils import BigGAN_wrapper, loadBigGAN
+
     from torchvision.transforms import ToPILImage
     BGAN = loadBigGAN("biggan-deep-256").cuda()
     BG = BigGAN_wrapper(BGAN)

@@ -80,9 +80,9 @@ def build_montages(image_list, image_shape, montage_shape, transpose=True, padH=
     for idx, img in enumerate(rsz_list):
         pagen, pagei = divmod(idx, (rown*coln))
         if rowfirst:
-            rn, cn = divmod(pagei, coln)
+            cn, rn = divmod(pagei, rown)
         else:
-            cn, rn = divmod(pagei, coln) # ??? the parametrization
+            rn, cn = divmod(pagei, rown) # ??? the parametrization
         montage_image[padH+rn*(imH+padH):(rn+1)*(imH+padH), padW+cn*(imW+padW):(cn+1)*(imW+padW), :] = img
         if (idx + 1) % (rown*coln) == 0:
             montages.append(montage_image)

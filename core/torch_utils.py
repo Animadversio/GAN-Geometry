@@ -3,8 +3,19 @@ import time
 import torch
 from torchvision.utils import make_grid
 from torchvision.transforms import ToPILImage
+from PIL import Image
+import numpy as np
+# utils to show 3d numpy array.
+def show_npimage(mtg, title=""):
+    if mtg.dtype is not np.uint8:
+        if np.max(mtg) < 1.2:
+            Image.fromarray((255 * np.clip(mtg, 0, 1)).astype(np.uint8)).show(title)
+        else:
+            Image.fromarray((np.clip(mtg, 0, 255)).astype(np.uint8)).show(title)
+    else:
+        Image.fromarray(mtg).show(title)
 
-# utils to show 4d torch tensors as grid of images.
+# utils to show or save 4d torch tensors as grid of images.
 def show_imgrid(img_tsr, *args, **kwargs):
     if type(img_tsr) is list:
         if img_tsr[0].ndim == 4:
