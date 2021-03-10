@@ -13,6 +13,7 @@ from os.path import join
 from glob import glob
 from time import time
 from tqdm import tqdm
+from easydict import EasyDict
 import numpy as np
 import matplotlib.pylab as plt
 from matplotlib import cm
@@ -590,6 +591,11 @@ def hessian_summary_pipeline(savedir, modelnm, figdir, npzpatt="Hess_BP_(\d*).np
                                          savelabel=modelnm)
     fig3 = plot_consistency_example(eva_col, evc_col, figdir=figdir, nsamp=5, titstr="%s" % modelnm, savelabel=modelnm)
     fig3 = plot_consistency_example(eva_col, evc_col, figdir=figdir, nsamp=3, titstr="%s" % modelnm, savelabel=modelnm)
+    S = EasyDict({"eva_col":eva_col, "evc_col":evc_col, "feat_col":feat_col, "meta":meta, 
+            "corr_mat_log":corr_mat_log, "corr_mat_lin":corr_mat_lin,"corr_mat_vec":corr_mat_vec, 
+            "npzpatt":npzpatt, "featkey":featkey, "evakey":evakey, "evckey":evckey, "modelnm":modelnm, "savedir":savedir})
+    return S
+    
 
 #%% Section: Hessian comparison at the same location
 def spectra_cmp(eigvals1, eigvals2, show=True):
