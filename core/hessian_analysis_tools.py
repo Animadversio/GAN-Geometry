@@ -591,7 +591,8 @@ def hessian_summary_pipeline(savedir, modelnm, figdir, npzpatt="Hess_BP_(\d*).np
                                          savelabel=modelnm)
     fig3 = plot_consistency_example(eva_col, evc_col, figdir=figdir, nsamp=5, titstr="%s" % modelnm, savelabel=modelnm)
     fig3 = plot_consistency_example(eva_col, evc_col, figdir=figdir, nsamp=3, titstr="%s" % modelnm, savelabel=modelnm)
-    S = EasyDict({"eva_col":eva_col, "evc_col":evc_col, "feat_col":feat_col, "meta":meta, 
+    S = EasyDict({"eva_col":eva_col, "evc_col":evc_col, "feat_col":feat_col, "meta":meta,
+            "H_avg":H_avg, "eva_avg":eva_avg, "evc_avg":evc_avg, 
             "corr_mat_log":corr_mat_log, "corr_mat_lin":corr_mat_lin,"corr_mat_vec":corr_mat_vec, 
             "npzpatt":npzpatt, "featkey":featkey, "evakey":evakey, "evckey":evckey, "modelnm":modelnm, "savedir":savedir})
     return S
