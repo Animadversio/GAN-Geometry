@@ -1,8 +1,8 @@
 # "A Geometric Analysis of Deep Generative Image Models and Its Applications" Official Code 
  
-This repo curate generic toolkits for **analyzing the latent geometry of generative models**, and using the goemetric information to improve on various applications like GAN interpretability, inversion, optimization in latent space. 
+This repo provides generic toolkits for **analyzing the latent geometry of generative models**, and using the goemetric information to improve on various applications like GAN interpretability, inversion, optimization in latent space. 
 
-Specifically, it can compute the Riemannian metric tensor of the latent space of the generator, pulling back certain image distance function (e.g. LPIPS). Then the eigen structure of the metric tensor will yield useful information about the interpretable axes (usually in top eigen space), and efficient ways to explore in the latent space.  
+Specifically, it can compute the Riemannian metric tensor of the latent space of the generator, pulling back certain image distance function (e.g. LPIPS). Then the eigen structure of the metric tensor will yield useful information about the interpretable axes (usually in the top eigen space), and efficient ways to explore in the latent space.  
 
 A work published in ICLR 2021. 
 
@@ -12,11 +12,13 @@ A work published in ICLR 2021.
 ![](img/title_img.png)
 
 ## Basic Usage
+
 ```python
 import lpips
+import numpy as np
 from core.GAN_utils import BigGAN_wrapper, loadBigGAN
 from core import hessian_compute
-from core.hessian_axis_visualize import vis_eigen_action, vis_eigen_explore
+from core.hessian_axis_visualize import vis_eigen_action, vis_eigen_explore, vis_distance_curve
 # Define a image distance metric
 ImDist = lpips.LPIPS(net="squeeze", )
 # Define and wrap up a generator
@@ -26,26 +28,40 @@ BGAN.requires_grad_(False)
 G = BigGAN_wrapper(BGAN)
 feat = G.sample_vector(device="cuda", class_id=145) # class King Penguin
 # Compute the local Riemannian metric
-eva_FI, evc_FI, H_FI = hessian_compute(G, feat, ImDist, hessian_method="BackwardIter", cutoff=20)
+eigval, eigvec, H = hessian_compute(G, feat, ImDist, hessian_method="BackwardIter", cutoff=20)
 # Visualize the axes
 refvect = feat.cpu().numpy()
-mtg, codes_all,  = vis_eigen_explore(refvect, evc_FI, eva_FI, G, eiglist=[1,2,4,8,16], transpose=False,
-                                        maxdist=0.5, rown=7, sphere=False, save=False)
+montage, _,  = vis_eigen_explore(refvect, eigvec, eigval, G, eiglist=[1,2,4,8,16], transpose=False,
+                                maxdist=0.5, rown=7, sphere=False, save=False)
+distmat, _, _ = vis_distance_curve(refvect, eigvec, eigval, G, ImDist, eiglist=[1,2,4,8,16],
+                                    maxdist=0.5, rown=5, sphere=False, distrown=15)
 # Visualize the axes applied to other reference images.  
+ref_codes = np.random.randn(5, 128)
+montage2, _ = vis_eigen_action(eigvec, ref_codes, G, transpose=False, 
+                                maxdist=0.5, rown=7, sphere=False, save=False)
 ```
+More examples in our tutorial notebooks, which walk you through a toy version of our figures.  
+
+## How It Works?
 
 
 ## Structure of Repo
-`analysis` contains code for analyzing computed Hessian information and generate figure and statistics from it. 
+`core` contains code for analyzing computed Hessian information and generate figure and statistics from it. 
+* `GAN_hessian_compute` implement the core API for compute metric tensor given a generator and a distance metric. It depends on 
+    * `GAN_hvp_operator` implement the Hessian Vector Product operator based on auto-differentiation and finite differencing.  
+    * `lanczos_generalized` link the HVP operator to the ARPACK eigenvalue solver in `scipy`.
+* `GAN_utils` provides loader and wrapper of pretrained generators.
+* `hessian_analysis_tools` provides handy functions to analyze and visualize the geometry after computing the metric tensors.
+* `hessian_axis_visualize` provides functions to visualize the image transformations that the axes represents  
 
 ## Key Dependency
 
-* pytorch (we have tested 1.3.1 and 1.5.0)
-* CUDA (we have tested 10.1)
-* scipy
+* `pytorch` (we have tested 1.3.1 and 1.5.0)
+* `scipy` 
+* `CUDA` (we have tested 10.1)
 * [`hessian-eigenthings`](https://github.com/noahgolmant/pytorch-hessian-eigenthings). Use this 
 `pip install --upgrade git+https://github.com/noahgolmant/pytorch-hessian-eigenthings.git@master#egg=hessian-eigenthings`
-* [LPIPS](https://github.com/richzhang/PerceptualSimilarity), `pip install lpips`
+* [`LPIPS`](https://github.com/richzhang/PerceptualSimilarity), `pip install lpips`
 
 Code has been developed and tested on a GTX 1060 GPU (6GB). 
 
@@ -63,4 +79,3 @@ Our algorithm is a generic analysis that could be applied to generative models. 
 
 To analyze your own GAN, follow this tutorial to come [Tutorial_Custom_Metric_and_GANs](Tutorial_Custom_Metric_and_GANs.ipynb)
 
-## Efficiency of Analysis
