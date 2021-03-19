@@ -562,6 +562,7 @@ def plot_layer_amplif_curves(eva_col, evc_col, H_col, layernames, savestr="", fi
             plt.plot(np.log10(alphavec[::-1] / scaler), label=layernames[Lj], color=colorseq[Lj], lw=2, alpha=0.7)
         plt.xlabel("Rank of eigenvector (layer %d %s)" % (Li, layernames[Li]))
         plt.ylabel("Amplification (normalize max to 1)" if maxnorm else "Amplification")  # (layer %d %s)"%(Lj, layernames[Lj]
+        plt.title("Amplification factor of layer %s eigenvector in all layers"%layernames[Li])
         plt.legend()
         plt.savefig(join(figdir, "%s_Ampl_curv_evc_Layer%d%s.png" % (savestr, Li, "_mxnorm" if maxnorm else "")))
         plt.savefig(join(figdir, "%s_Ampl_curv_evc_Layer%d%s.pdf" % (savestr, Li, "_mxnorm" if maxnorm else "")))
