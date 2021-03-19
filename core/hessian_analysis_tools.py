@@ -310,8 +310,41 @@ def plot_consistency_example(eigval_col, eigvec_col, nsamp=5, titstr="GAN", figd
     plt.savefig(join(figdir, "Hess_consistency_example_%s_rnd%03d.pdf" % (savelabel, RND)),
                 bbox_extra_artists=[ST])  #
     return fig
+
+
+def hessian_summary_pipeline(savedir, modelnm, figdir, npzpatt="Hess_BP_(\d*).npz", featkey="feat",
+                             evakey='eva_BP', evckey='evc_BP', ):
+    """ This script crunch down a collection of Hessian computed for a GAN and output proper statistics
+    for it. Simple Quick end to end analysis
+    savedir: contains an array of npz files with file name pattern npzpatt default `Hess_BP_(\d*).npz`
+    featkey, evakey, evckey: Keys to read the refvector, eva, evc in the npz file
+    """
+    eva_col, evc_col, feat_col, meta = scan_hess_npz(savedir, npzpatt, featkey=featkey, evakey=evakey, evckey=evckey)
+    # compute the Mean Hessian and save
+    H_avg, eva_avg, evc_avg = average_H(eva_col, evc_col, )
+    np.savez(join(figdir, "H_avg_%s.npz" % modelnm), H_avg=H_avg, eva_avg=eva_avg, evc_avg=evc_avg, feats=feat_col)
+    # compute and plot spectra
+    fig0 = plot_spectra(eigval_col=eva_col, savename="%s_spectrum" % modelnm, figdir=figdir)
+    np.savez(join(figdir, "spectra_col_%s.npz" % modelnm), eigval_col=eva_col, )
+    # compute and plot the correlation between hessian at different points
+    corr_mat_log, corr_mat_lin = compute_hess_corr(eva_col, evc_col, figdir=figdir, use_cuda=False, savelabel=modelnm)
+    corr_mat_vec = compute_vector_hess_corr(eva_col, evc_col, figdir=figdir, use_cuda=False, savelabel=modelnm)
+    fig1, fig2 = plot_consistentcy_mat(corr_mat_log, corr_mat_lin, figdir=figdir, titstr="%s" % modelnm,
+                                       savelabel=modelnm)
+    fig11, fig22 = plot_consistency_hist(corr_mat_log, corr_mat_lin, figdir=figdir, titstr="%s" % modelnm,
+                                         savelabel=modelnm)
+    fig3 = plot_consistency_example(eva_col, evc_col, figdir=figdir, nsamp=5, titstr="%s" % modelnm, savelabel=modelnm)
+    fig3 = plot_consistency_example(eva_col, evc_col, figdir=figdir, nsamp=3, titstr="%s" % modelnm, savelabel=modelnm)
+    S = EasyDict({"eva_col": eva_col, "evc_col": evc_col, "feat_col": feat_col, "meta": meta,
+                  "H_avg": H_avg, "eva_avg": eva_avg, "evc_avg": evc_avg,
+                  "corr_mat_log": corr_mat_log, "corr_mat_lin": corr_mat_lin, "corr_mat_vec": corr_mat_vec,
+                  "npzpatt": npzpatt, "featkey": featkey, "evakey": evakey, "evckey": evckey, "modelnm": modelnm,
+                  "savedir": savedir})
+    return S
+
+
 #%%
-def plot_layer_consistency_mat(corr_mat_log, corr_mat_lin, corr_mat_vec, savelabel="", figdir="", titstr="GAN", layernames=None):
+def plot_layer_consistency_mat(corr_mat_log, corr_mat_lin, corr_mat_vec, layernames=None, savelabel="", figdir="", titstr="GAN"):
     """How Hessian matrix in different layers correspond to each other. """
     posN = corr_mat_log.shape[0]
     corr_mat_log_nodiag = corr_mat_log.copy()
@@ -424,7 +457,7 @@ def plot_layer_consistency_example(eigval_col, eigvec_col, layernames, layeridx=
     return fig
 
 def plot_layer_mat(layer_mat, layernames=None, titstr="Correlation of Amplification in BigGAN"):
-    """Formatting function for ploting Layer by Layer matrix"""
+    """Local formatting function for ploting Layer by Layer matrix, used in `compute_plot_layer_corr_mat` """
     Lnum = layer_mat.shape[0]
     fig = plt.figure(figsize=[9, 8])
     plt.matshow(layer_mat, fignum=0)
@@ -536,6 +569,10 @@ def plot_layer_amplif_curves(eva_col, evc_col, H_col, layernames, savestr="", fi
 
 def plot_layer_amplif_consistency(eigval_col, eigvec_col, layernames, layeridx=[0,1,-1], titstr="GAN", figdir="",
                                    savelabel=""):
+    """ Plot the consistency matrix just like the spatial Hessian consistency. Resulting figure will have len(layeridx) by
+        len(layeridx) panels.
+    layeridx: index of layer to plot, index in layernames and eigval_col, eigvec_col.
+    """
     nsamp = len(layeridx)
     print("Plot hessian of layers : ", [layernames[idx] for idx in layeridx])
     fig = plt.figure(figsize=[10, 10], constrained_layout=False)
@@ -568,37 +605,9 @@ def plot_layer_amplif_consistency(eigval_col, eigvec_col, layernames, layeridx=[
                 bbox_extra_artists=[ST])  #
     return fig
 
-def hessian_summary_pipeline(savedir, modelnm, figdir, npzpatt="Hess_BP_(\d*).npz", featkey="feat",
-                             evakey='eva_BP', evckey='evc_BP', ):
-    """ This script crunch down a collection of Hessian computed for a GAN and output proper statistics
-    for it. Simple Quick end to end analysis
-    savedir: contains an array of npz files with file name pattern npzpatt default `Hess_BP_(\d*).npz`
-    featkey, evakey, evckey: Keys to read the refvector, eva, evc in the npz file
-    """
-    eva_col, evc_col, feat_col, meta = scan_hess_npz(savedir, npzpatt, featkey=featkey, evakey=evakey, evckey=evckey)
-    # compute the Mean Hessian and save
-    H_avg, eva_avg, evc_avg = average_H(eva_col, evc_col, )
-    np.savez(join(figdir, "H_avg_%s.npz" % modelnm), H_avg=H_avg, eva_avg=eva_avg, evc_avg=evc_avg, feats=feat_col)
-    # compute and plot spectra
-    fig0 = plot_spectra(eigval_col=eva_col, savename="%s_spectrum" % modelnm, figdir=figdir)
-    np.savez(join(figdir, "spectra_col_%s.npz" % modelnm), eigval_col=eva_col, )
-    # compute and plot the correlation between hessian at different points
-    corr_mat_log, corr_mat_lin = compute_hess_corr(eva_col, evc_col, figdir=figdir, use_cuda=False, savelabel=modelnm)
-    corr_mat_vec = compute_vector_hess_corr(eva_col, evc_col, figdir=figdir, use_cuda=False, savelabel=modelnm)
-    fig1, fig2 = plot_consistentcy_mat(corr_mat_log, corr_mat_lin, figdir=figdir, titstr="%s" % modelnm,
-                                       savelabel=modelnm)
-    fig11, fig22 = plot_consistency_hist(corr_mat_log, corr_mat_lin, figdir=figdir, titstr="%s" % modelnm,
-                                         savelabel=modelnm)
-    fig3 = plot_consistency_example(eva_col, evc_col, figdir=figdir, nsamp=5, titstr="%s" % modelnm, savelabel=modelnm)
-    fig3 = plot_consistency_example(eva_col, evc_col, figdir=figdir, nsamp=3, titstr="%s" % modelnm, savelabel=modelnm)
-    S = EasyDict({"eva_col":eva_col, "evc_col":evc_col, "feat_col":feat_col, "meta":meta,
-            "H_avg":H_avg, "eva_avg":eva_avg, "evc_avg":evc_avg, 
-            "corr_mat_log":corr_mat_log, "corr_mat_lin":corr_mat_lin,"corr_mat_vec":corr_mat_vec, 
-            "npzpatt":npzpatt, "featkey":featkey, "evakey":evakey, "evckey":evckey, "modelnm":modelnm, "savedir":savedir})
-    return S
-    
 
-#%% Section: Hessian comparison at the same location
+
+#%% Section: Hessian comparison at the same location. Different metrics to compare Hessian.
 def spectra_cmp(eigvals1, eigvals2, show=True):
     cc = np.corrcoef((eigvals1), (eigvals2))[0, 1]
     logcc = np.corrcoef(np.log10(np.abs(eigvals1)+1E-8), np.log10(np.abs(eigvals2)+1E-8))[0, 1]

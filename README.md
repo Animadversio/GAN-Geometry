@@ -43,7 +43,7 @@ montage2, _ = vis_eigen_action(eigvec, ref_codes, G, transpose=False,
 More examples in our tutorial notebooks, which walk you through a toy version of our figures.  
 
 ## How It Works?
-The metric tensor `H` of the image manifold defined by generator `G` is the Hessian of the squared distance function `d^2` on it.
+The metric tensor `H` of the image manifold defined by generator `G` is the Hessian of the squared distance function `d^2` on it. In our case the squared distance function is L2 or LPIPS distance. 
 
 <img src="https://render.githubusercontent.com/render/math?math=H(z_0) = \partial_z^2 d^2(G(z_0),G(z))">
 
