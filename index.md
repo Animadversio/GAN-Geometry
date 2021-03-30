@@ -5,7 +5,7 @@ This is the project page for the paper **The Geometry of Deep Generative Models 
 
 In this work, we explored the structure of the latent space of generative models from a differential geometric perspective. Surprisingly, analysis of the Riemannian metric tensor of the manifold created by many modern generators showed that they exhibit many common geometric features, i.e. anisotropy among directions, homogeneity in space and alignment across layers. These geometric properties unifies many previous ways to discover interpretable axes in the space. Leveraging the geometry of the space yields more efficient way to optimize on the image manifold of generators. 
 
-This work is accepted in ICLR 2021. Paper: [OpenReview](https://openreview.net/forum?id=GH7QRzUDdXG) [ArXiv](https://arxiv.org/abs/2101.06006)
+This work is accepted in ICLR 2021. Paper: [OpenReview](https://openreview.net/forum?id=GH7QRzUDdXG); [ArXiv](https://arxiv.org/abs/2101.06006)
 
 <!-- ## Welcome to GitHub Pages
 
