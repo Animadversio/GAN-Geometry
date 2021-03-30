@@ -9,7 +9,7 @@ A work published in ICLR 2021.
 * [Open Review](https://openreview.net/forum?id=GH7QRzUDdXG)
 * [Arxiv](https://arxiv.org/abs/2101.06006)
 
-![](img/title_img.png)
+![](img/Poster_thumbnail.png)
 
 ## Basic Usage
 

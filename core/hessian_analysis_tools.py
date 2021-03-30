@@ -569,7 +569,7 @@ def plot_layer_amplif_curves(eva_col, evc_col, H_col, layernames, savestr="", fi
         plt.show()
 
 def plot_layer_amplif_consistency(eigval_col, eigvec_col, layernames, layeridx=[0,1,-1], titstr="GAN", figdir="",
-                                   savelabel=""):
+                                   savelabel="", src_eigval=True):
     """ Plot the consistency matrix just like the spatial Hessian consistency. Resulting figure will have len(layeridx) by
         len(layeridx) panels.
     layeridx: index of layer to plot, index in layernames and eigval_col, eigvec_col.
@@ -588,7 +588,10 @@ def plot_layer_amplif_consistency(eigval_col, eigvec_col, layernames, layeridx=[
             if axi == axj:
                 ax.hist(np.log10(eigval_i), 20)
             else:
-                ax.scatter(np.log10(eigval_i), np.log10(vHv_ij), s=15, alpha=0.6)
+                if src_eigval:  # plot eigen values of source layer on x axis
+                    ax.scatter(np.log10(eigval_i), np.log10(vHv_ij), s=15, alpha=0.6)
+                else:  # plot eigen values of target layers on x axis
+                    ax.scatter(np.log10(eigval_j), np.log10(vHv_ij), s=15, alpha=0.6)
                 ax.set_aspect(1, adjustable='datalim')
             if axi == nsamp - 1:
                 ax.set_xlabel("H @ %s" % layernames[Lj])
