@@ -1,18 +1,19 @@
-## Welcome to GitHub Pages
+# The Geometry of Deep Generative Models and Its Applications (ICLR 2021)
+![Poster Thumbnails](imgs/Poster_ThumbNails.png)
+
+This is the project page for the paper **The Geometry of Deep Generative Models and Its Applications**. 
+
+In this work, we explored the structure of the latent space of generative models from a differential geometric perspective. Surprisingly, analysis of the Riemannian metric tensor of the manifold created by many modern generators showed that they exhibit many common geometric features, i.e. anisotropy among directions, homogeneity in space and alignment across layers. These geometric properties unifies many previous ways to discover interpretable axes in the space. Leveraging the geometry of the space yields more efficient way to optimize on the image manifold of generators. 
+
+This work is accepted in ICLR 2021. Paper: [OpenReview](https://openreview.net/forum?id=GH7QRzUDdXG) [ArXiv](https://arxiv.org/abs/2101.06006)
+
+<!-- ## Welcome to GitHub Pages
 
 You can use the [editor on GitHub](https://github.com/Animadversio/GAN-Geometry/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
 
 Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
 
-# The Geometry of Deep Generative Models and Its Applications (ICLR 2021)
-![Poster Thumbnails](imgs/Poster_ThumbNails.png)
-
-
-
 ### Jekyll Themes
 
 Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/Animadversio/GAN-Geometry/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+ -->
