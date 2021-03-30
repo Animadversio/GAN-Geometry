@@ -1,4 +1,6 @@
 # The Geometry of Deep Generative Models and Its Applications (ICLR 2021)
+
+
 ![Poster Thumbnails](imgs/Poster_ThumbNails.png)
 
 This is the project page for the paper **The Geometry of Deep Generative Models and Its Applications**. 
