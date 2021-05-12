@@ -9,6 +9,18 @@ In this work, we explored the structure of the latent space of generative models
 
 This work is accepted in ICLR 2021. Paper: [OpenReview](https://openreview.net/forum?id=GH7QRzUDdXG); [ArXiv](https://arxiv.org/abs/2101.06006)
 
+## Citing this Work
+```bibtex
+@inproceedings{
+wang2021aGANGeom,
+title={A Geometric Analysis of Deep Generative Image Models and Its Applications},
+author={Binxu Wang and Carlos R Ponce},
+booktitle={International Conference on Learning Representations},
+year={2021},
+url={https://openreview.net/forum?id=GH7QRzUDdXG}
+}
+```
+
 <!-- ## Welcome to GitHub Pages
 
 You can use the [editor on GitHub](https://github.com/Animadversio/GAN-Geometry/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
