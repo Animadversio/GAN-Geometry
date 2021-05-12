@@ -93,7 +93,7 @@ To analyze your own GAN, follow this tutorial to come [Tutorial_Custom_Metric_an
 ## Citing this Work
 ```bibtex
 @inproceedings{
-wang2021a,
+wang2021aGANGeom,
 title={A Geometric Analysis of Deep Generative Image Models and Its Applications},
 author={Binxu Wang and Carlos R Ponce},
 booktitle={International Conference on Learning Representations},
