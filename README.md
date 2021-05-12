@@ -89,3 +89,15 @@ Our algorithm is a generic analysis that could be applied to generative models. 
 
 To analyze your own GAN, follow this tutorial to come [Tutorial_Custom_Metric_and_GANs](Tutorial_Custom_Metric_and_GANs.ipynb)
 
+
+## Citing this Work
+```bibtex
+@inproceedings{
+wang2021a,
+title={A Geometric Analysis of Deep Generative Image Models and Its Applications},
+author={Binxu Wang and Carlos R Ponce},
+booktitle={International Conference on Learning Representations},
+year={2021},
+url={https://openreview.net/forum?id=GH7QRzUDdXG}
+}
+```
