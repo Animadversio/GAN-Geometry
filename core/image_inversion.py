@@ -22,8 +22,8 @@ from skimage.transform import rescale, resize
 # from GAN_utils import StyleGAN2_wrapper, loadStyleGAN2
 from pytorch_pretrained_biggan import truncated_noise_sample, one_hot_from_int
 from lpips import LPIPS
-from load_hessian_data import load_Haverage
-from torch_utils import show_imgrid, save_imgrid, ToPILImage, make_grid
+from .load_hessian_data import load_Haverage
+from .torch_utils import show_imgrid, save_imgrid, ToPILImage, make_grid
 def MSE(im1, im2, mask=None):
     """Distance function between images. consider loss weighted by mask if available
     Inputs:
@@ -567,16 +567,15 @@ def load_BigGAN_basis():
     basisdict = {"all": evc_all, "sep": evc_sep, "none": evc_none}
     return basisdict  # evc_all, evc_sep, evc_none
 
-#%%
 if __name__ is "__main__":
-    from GAN_utils import loadBigGAN, BigGAN_wrapper
+    from .GAN_utils import loadBigGAN, BigGAN_wrapper
     BGAN = loadBigGAN()
     G = BigGAN_wrapper(BGAN)
     ImDist = LPIPS(net="squeeze", ).cuda()
     ImDist.requires_grad_(False)
     basisdict = load_BigGAN_basis()
     imroot = r"src"
-    imgnm = 
+    imgnm = r"monkey.jpg"
     saveroot = r"results"
     srcimg = plt.imread(join(imroot, imgnm))
     srcimg_rsz = crop_rsz(srcimg, crop_param="center", )
@@ -586,9 +585,9 @@ if __name__ is "__main__":
            cmasteps=80, gradsteps=0, finalgrad=400, batch_size=30, basis="all", basisvec=basisdict["all"],
            CMApostAdam=False, savedir=saveroot, imgnm=imgnm+"_cma_pen", classvec_init=monkey_vec,
            L2penalty=(0.09, 0), classpenalty=0.4)
-        # imgs_final, codes_final, scores_final, L1score_final, Record = BasinCMA_BigGAN(srctsr_rsz, G, ImDist,
-        #    cmasteps=10, gradsteps=10, finalgrad=500, batch_size=4, basis="all", basisvec=basisdict["all"],
-        #    CMApostAdam=False, savedir=saveroot, imgnm=imgnm)
+    # imgs_final, codes_final, scores_final, L1score_final, Record = BasinCMA_BigGAN(srctsr_rsz, G, ImDist,
+    #    cmasteps=10, gradsteps=10, finalgrad=500, batch_size=4, basis="all", basisvec=basisdict["all"],
+    #    CMApostAdam=False, savedir=saveroot, imgnm=imgnm)
     #%%
     from GAN_utils import loadStyleGAN2, StyleGAN2_wrapper
     imroot = r"src"
